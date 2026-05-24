@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+  initIntroScreen();
   createFloatingHearts();
   initPageSystem();
   initQuiz();
@@ -12,7 +13,119 @@ document.addEventListener('DOMContentLoaded', () => {
   initStartButton();
   initClickBursts();
   initHeroTypewriter();
+  initCursorTrail();
+  initSparkleDust();
+  initTiltCards();
+  initComplimentGenerator();
+  initHugButton();
+  initHeroParallax();
+  initLoveNotes();
+  initBackgroundMusic();
 });
+
+/* ====== INTRO SCREEN ====== */
+function initIntroScreen() {
+  const intro = document.getElementById('introScreen');
+  const greeting = document.getElementById('introGreeting');
+  if (!intro) return;
+
+  if (greeting) greeting.textContent = getTimeBasedGreeting();
+
+  const dismiss = () => {
+    intro.classList.add('hidden');
+    setTimeout(() => intro.remove(), 900);
+  };
+
+  setTimeout(dismiss, 3300);
+  intro.addEventListener('click', dismiss);
+}
+
+function getTimeBasedGreeting() {
+  const h = new Date().getHours();
+  if (h < 5) return 'Sweet midnight wishes,';
+  if (h < 12) return 'Good morning,';
+  if (h < 17) return 'Good afternoon,';
+  if (h < 21) return 'Good evening,';
+  return 'Goodnight wishes,';
+}
+
+/* ====== CURSOR HEART TRAIL ====== */
+function initCursorTrail() {
+  const isFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (!isFinePointer) return;
+
+  const symbols = ['💕', '💖', '✨', '💗'];
+  let lastSpawn = 0;
+  const minInterval = 70;
+
+  document.addEventListener('mousemove', (e) => {
+    const now = Date.now();
+    if (now - lastSpawn < minInterval) return;
+    lastSpawn = now;
+
+    const heart = document.createElement('span');
+    heart.className = 'trail-heart';
+    heart.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+    heart.style.left = e.clientX + (Math.random() * 16 - 8) + 'px';
+    heart.style.top = e.clientY + (Math.random() * 10 - 5) + 'px';
+    heart.style.fontSize = (0.7 + Math.random() * 0.5) + 'rem';
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 1300);
+  });
+}
+
+/* ====== AMBIENT SPARKLE DUST ====== */
+function initSparkleDust() {
+  const container = document.getElementById('sparkleDust');
+  if (!container) return;
+
+  function spawn() {
+    const p = document.createElement('div');
+    p.className = 'dust-particle';
+    p.style.left = Math.random() * 100 + 'vw';
+    const duration = 10 + Math.random() * 12;
+    p.style.setProperty('--duration', duration + 's');
+    p.style.setProperty('--drift', (Math.random() * 200 - 100) + 'px');
+    const size = 2 + Math.random() * 4;
+    p.style.width = p.style.height = size + 'px';
+    p.style.opacity = (0.3 + Math.random() * 0.5).toString();
+    container.appendChild(p);
+    setTimeout(() => p.remove(), duration * 1000 + 500);
+  }
+
+  for (let i = 0; i < 6; i++) setTimeout(spawn, i * 800);
+  setInterval(spawn, 1400);
+}
+
+/* ====== 3D TILT ON HOVER ====== */
+function initTiltCards() {
+  const isFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (!isFinePointer) return;
+
+  const cards = document.querySelectorAll('.reason-card, .counter-card, .polaroid');
+
+  cards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const cx = rect.width / 2;
+      const cy = rect.height / 2;
+      const rx = ((y - cy) / cy) * -6;
+      const ry = ((x - cx) / cx) * 6;
+
+      const baseRot = card.classList.contains('polaroid')
+        ? `rotate(${getComputedStyle(card).getPropertyValue('--rot') || '0deg'})`
+        : '';
+
+      card.style.transform = `${baseRot} perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-4px) scale(1.02)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+    });
+  });
+}
 
 /* ====== CLICK BURST EFFECT (hearts/sparkles fly out on click) ====== */
 const burstSymbols = ['💕', '💖', '✨', '🌸', '💗', '⭐', '🌟'];
@@ -832,6 +945,16 @@ function resetEverything() {
   envelope.style.pointerEvents = '';
   envelope.classList.remove('opened');
   letterContent.classList.remove('visible');
+
+  // Reset Compliment Generator
+  const compCard = document.getElementById('complimentCard');
+  const compText = document.getElementById('complimentText');
+  const compCounter = document.getElementById('complimentCounter');
+  if (compCard) compCard.classList.remove('revealed');
+  if (compText) compText.textContent = '';
+  if (compCounter) compCounter.textContent = '';
+  complimentCount = 0;
+  usedCompliments = [];
 }
 
 /* ====== START BUTTON ====== */
@@ -934,3 +1057,352 @@ window.addEventListener('resize', () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 });
+
+/* ====== COMPLIMENT GENERATOR ====== */
+const compliments = [
+  "You're not just beautiful — you're the kind of beautiful that makes ordinary days feel like festivals.",
+  "Your smile is honestly my favourite notification.",
+  "The way you care about people quietly is one of your softest superpowers.",
+  "You make even the simplest words sound like poetry, Rashi.",
+  "Your laugh is my favourite playlist.",
+  "You're proof that good people still exist — kind, soft, and rare.",
+  "Even on your bad days, you shine more than you realise.",
+  "You have the heart of a poet and the mind of a healer.",
+  "Watching you chase your dreams is the most inspiring thing I know.",
+  "You're the reason 'main character energy' exists.",
+  "Your eyes have entire universes hidden in them.",
+  "You're the calm in my noisy days.",
+  "Falling for you was the easiest decision I never had to think about.",
+  "You make 'forever' sound like a beautiful, possible thing.",
+  "Your shayaris hit harder than any song on my playlist.",
+  "You sing like the world is listening — and it should be.",
+  "You're the reason I believe in soft, slow, real love.",
+  "Even at 3 AM, with no makeup and tired eyes, you'd still be the prettiest thing in any room.",
+  "You're someone people notice and never quite forget.",
+  "Your kindness is loud, even when you're quiet.",
+  "You handle hard things with so much grace, it surprises me every time.",
+  "You make distance feel smaller just by being yourself.",
+  "Your patience deserves an award. So do you.",
+  "You're someone's reason to believe again — and definitely mine.",
+  "Being loved by you feels like coming home.",
+  "You're poetry that walks, talks, and laughs.",
+  "Your soul is rare. Don't ever doubt that.",
+  "You're allowed to take up space — your kind, beautiful kind of space.",
+  "If kindness had a face, it'd probably look a lot like yours.",
+  "You're the soft win I didn't know my heart was hoping for."
+];
+let complimentCount = 0;
+let usedCompliments = [];
+
+function initComplimentGenerator() {
+  const btn = document.getElementById('complimentBtn');
+  const card = document.getElementById('complimentCard');
+  const textEl = document.getElementById('complimentText');
+  const counterEl = document.getElementById('complimentCounter');
+  if (!btn || !card || !textEl) return;
+
+  const btnTextEl = btn.querySelector('.compliment-btn-text');
+
+  btn.addEventListener('click', () => {
+    if (usedCompliments.length === compliments.length) usedCompliments = [];
+    let pick;
+    do {
+      pick = compliments[Math.floor(Math.random() * compliments.length)];
+    } while (usedCompliments.includes(pick));
+    usedCompliments.push(pick);
+
+    card.classList.remove('revealed');
+    requestAnimationFrame(() => {
+      textEl.textContent = pick;
+      card.classList.add('revealed');
+    });
+
+    complimentCount += 1;
+    if (counterEl) {
+      counterEl.textContent = complimentCount === 1
+        ? "1 compliment delivered 💕"
+        : `${complimentCount} compliments delivered 💕`;
+    }
+    if (btnTextEl) btnTextEl.textContent = "Give me another 💗";
+
+    // Burst hearts above the button
+    spawnComplimentBurst(btn);
+  });
+}
+
+function spawnComplimentBurst(originEl) {
+  const rect = originEl.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const symbols = ['💗', '💖', '💕', '✨', '🌸'];
+  for (let i = 0; i < 10; i++) {
+    const el = document.createElement('span');
+    el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+    el.style.cssText = `
+      position:fixed;left:${cx}px;top:${cy}px;
+      font-size:${14 + Math.random() * 14}px;
+      pointer-events:none;z-index:9995;
+      transform:translate(-50%,-50%);
+      transition:transform 1s ease-out, opacity 1s ease-out;
+    `;
+    document.body.appendChild(el);
+    const angle = (Math.PI * 2 * i) / 10;
+    const dist = 70 + Math.random() * 60;
+    requestAnimationFrame(() => {
+      el.style.transform = `translate(calc(-50% + ${Math.cos(angle) * dist}px), calc(-50% + ${Math.sin(angle) * dist - 20}px)) scale(0.6)`;
+      el.style.opacity = '0';
+    });
+    setTimeout(() => el.remove(), 1100);
+  }
+}
+
+/* ====== HUG BUTTON (long-press) ====== */
+function initHugButton() {
+  const btn = document.getElementById('hugBtn');
+  if (!btn) return;
+  let holdTimer = null;
+  let holding = false;
+
+  const startHold = (e) => {
+    e.preventDefault();
+    if (holding) return;
+    holding = true;
+    btn.classList.add('holding');
+    holdTimer = setTimeout(() => {
+      btn.classList.remove('holding');
+      btn.classList.add('hugged');
+      sendHug();
+      setTimeout(() => btn.classList.remove('hugged'), 700);
+      holding = false;
+    }, 1200);
+  };
+
+  const cancelHold = () => {
+    if (!holding) return;
+    holding = false;
+    clearTimeout(holdTimer);
+    btn.classList.remove('holding');
+  };
+
+  btn.addEventListener('mousedown', startHold);
+  btn.addEventListener('touchstart', startHold, { passive: false });
+  btn.addEventListener('mouseup', cancelHold);
+  btn.addEventListener('mouseleave', cancelHold);
+  btn.addEventListener('touchend', cancelHold);
+  btn.addEventListener('touchcancel', cancelHold);
+}
+
+function sendHug() {
+  let overlay = document.querySelector('.hug-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.className = 'hug-overlay';
+    overlay.innerHTML = `
+      <div class="hug-overlay-content">
+        <div class="hug-overlay-emoji">🫂</div>
+        <div class="hug-overlay-text">Sending you a tight hug, Rashi 💞</div>
+      </div>`;
+    document.body.appendChild(overlay);
+  }
+  requestAnimationFrame(() => overlay.classList.add('visible'));
+
+  // Floating hearts during the hug
+  for (let i = 0; i < 18; i++) {
+    setTimeout(() => {
+      const h = document.createElement('span');
+      h.textContent = ['💗', '💖', '💕', '🤍'][i % 4];
+      h.style.cssText = `
+        position:fixed;left:${Math.random() * 100}vw;top:100vh;
+        font-size:${18 + Math.random() * 18}px;
+        z-index:9991;pointer-events:none;
+        transition:transform 2s ease-out, opacity 2s ease-out;
+      `;
+      document.body.appendChild(h);
+      requestAnimationFrame(() => {
+        h.style.transform = `translateY(-110vh) translateX(${(Math.random() - 0.5) * 80}px)`;
+        h.style.opacity = '0';
+      });
+      setTimeout(() => h.remove(), 2100);
+    }, i * 60);
+  }
+
+  setTimeout(() => {
+    overlay.classList.remove('visible');
+  }, 2400);
+}
+
+/* ====== HERO MOUSE PARALLAX ====== */
+function initHeroParallax() {
+  const hero = document.getElementById('page-hero');
+  if (!hero) return;
+  if (window.matchMedia('(pointer: coarse)').matches) return; // skip on touch
+  hero.addEventListener('mousemove', (e) => {
+    const r = hero.getBoundingClientRect();
+    const px = ((e.clientX - r.left) / r.width - 0.5) * 2;  // -1..1
+    const py = ((e.clientY - r.top) / r.height - 0.5) * 2;
+    const targets = [
+      hero.querySelector('.hero-content'),
+      hero.querySelector('.hero-orbs'),
+      hero.querySelector('.hero-balloons'),
+      hero.querySelector('.hero-gift'),
+    ];
+    targets.forEach((el) => {
+      if (!el) return;
+      el.style.setProperty('--px', px.toFixed(3));
+      el.style.setProperty('--py', py.toFixed(3));
+    });
+  });
+  hero.addEventListener('mouseleave', () => {
+    hero.querySelectorAll('.hero-content, .hero-orbs, .hero-balloons, .hero-gift').forEach((el) => {
+      el.style.setProperty('--px', '0');
+      el.style.setProperty('--py', '0');
+    });
+  });
+}
+
+/* ====== RANDOM LOVE NOTE TOASTS ====== */
+const loveNotes = [
+  "Did I mention you're amazing today? 💕",
+  "Just a reminder — you're loved, Rashi 🌸",
+  "You're doing great, even if you don't feel it 💞",
+  "Quick thought: I'm proud of you ✨",
+  "Sending you a soft hug from here 🫂",
+  "You make ordinary days feel special 🌷",
+  "PS — you look really beautiful today 💗",
+  "Random thought: thank you for being you 💌",
+  "If you're tired, this is your sign to rest 💤",
+  "You're the best part of my day. Always. 💖"
+];
+
+function initLoveNotes() {
+  const toast = document.getElementById('loveToast');
+  const textEl = document.getElementById('loveToastText');
+  if (!toast || !textEl) return;
+  let used = [];
+
+  const showOne = () => {
+    if (document.hidden) return;
+    if (document.querySelector('.intro-screen:not(.hidden)')) return;
+    if (used.length === loveNotes.length) used = [];
+    let pick;
+    do {
+      pick = loveNotes[Math.floor(Math.random() * loveNotes.length)];
+    } while (used.includes(pick));
+    used.push(pick);
+    textEl.textContent = pick;
+    toast.classList.add('visible');
+    setTimeout(() => toast.classList.remove('visible'), 3800);
+  };
+
+  // First note after intro is gone, then every ~40-60s
+  setTimeout(showOne, 25000);
+  setInterval(() => {
+    if (Math.random() < 0.85) showOne();
+  }, 45000 + Math.random() * 15000);
+}
+
+/* ====== BACKGROUND MUSIC ====== */
+function initBackgroundMusic() {
+  const audio = document.getElementById('bgMusic');
+  const toggle = document.getElementById('musicToggle');
+  const tooltip = document.getElementById('musicTooltip');
+  if (!audio || !toggle) return;
+
+  audio.volume = 0.0;
+  const targetVolume = 0.32;
+  let isPlaying = false;
+  let userMuted = false;
+  let fadeInterval = null;
+
+  const fadeTo = (target, duration = 1500) => {
+    if (fadeInterval) clearInterval(fadeInterval);
+    const startVol = audio.volume;
+    const startTime = performance.now();
+    fadeInterval = setInterval(() => {
+      const t = Math.min(1, (performance.now() - startTime) / duration);
+      audio.volume = startVol + (target - startVol) * t;
+      if (t >= 1) {
+        clearInterval(fadeInterval);
+        fadeInterval = null;
+        if (target === 0) audio.pause();
+      }
+    }, 30);
+  };
+
+  const showTooltip = (msg, ms = 2500) => {
+    if (!tooltip) return;
+    tooltip.textContent = msg;
+    tooltip.classList.add('visible');
+    setTimeout(() => tooltip.classList.remove('visible'), ms);
+  };
+
+  const tryPlay = () => {
+    const playPromise = audio.play();
+    if (playPromise === undefined) return;
+    playPromise.then(() => {
+      isPlaying = true;
+      toggle.classList.add('playing');
+      toggle.classList.remove('muted');
+      fadeTo(targetVolume);
+    }).catch(() => {
+      // autoplay was blocked or file missing - silent fail
+    });
+  };
+
+  // Try to start music after first user interaction
+  const startOnInteraction = () => {
+    if (isPlaying || userMuted) return;
+    tryPlay();
+  };
+  document.addEventListener('click', startOnInteraction, { once: true });
+  document.addEventListener('touchstart', startOnInteraction, { once: true, passive: true });
+
+  // If start button is clicked, try then too (likely the first big interaction)
+  const startBtn = document.getElementById('startBtn');
+  if (startBtn) {
+    startBtn.addEventListener('click', () => {
+      if (!userMuted) tryPlay();
+    });
+  }
+
+  toggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (isPlaying) {
+      userMuted = true;
+      isPlaying = false;
+      fadeTo(0, 600);
+      toggle.classList.remove('playing');
+      toggle.classList.add('muted');
+      showTooltip('Music paused');
+    } else {
+      userMuted = false;
+      tryPlay();
+      // If file failed to load, give a hint
+      setTimeout(() => {
+        if (!isPlaying) {
+          showTooltip('Add music/birthday.mp3', 3500);
+        }
+      }, 350);
+    }
+  });
+
+  // Initial tooltip nudge
+  setTimeout(() => {
+    if (!isPlaying && !userMuted) showTooltip('Tap for music 🎵', 3500);
+  }, 6000);
+
+  // Pause when tab is hidden, resume when visible (if was playing)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && isPlaying) {
+      audio.pause();
+    } else if (!document.hidden && isPlaying && !userMuted) {
+      audio.play().catch(() => {});
+    }
+  });
+
+  // Handle audio errors gracefully
+  audio.addEventListener('error', () => {
+    toggle.classList.remove('playing');
+    toggle.classList.add('muted');
+  });
+}

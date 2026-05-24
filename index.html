@@ -11,6 +11,36 @@
 </head>
 <body>
 
+  <!-- Intro Loading Screen -->
+  <div class="intro-screen" id="introScreen">
+    <div class="intro-content">
+      <div class="intro-heart">
+        <span class="heart-emoji">💖</span>
+        <span class="heart-ring"></span>
+        <span class="heart-ring heart-ring-2"></span>
+      </div>
+      <p class="intro-greeting" id="introGreeting"></p>
+      <h1 class="intro-name">
+        <span>R</span><span>a</span><span>s</span><span>h</span><span>i</span>
+      </h1>
+      <p class="intro-tagline">A little something for you...</p>
+      <div class="intro-loader">
+        <div class="loader-dot"></div>
+        <div class="loader-dot"></div>
+        <div class="loader-dot"></div>
+      </div>
+    </div>
+    <div class="intro-petals">
+      <span>🌸</span><span>🌹</span><span>💕</span><span>🌸</span><span>✨</span><span>🌹</span><span>💖</span><span>🌸</span>
+    </div>
+  </div>
+
+  <!-- Cursor heart trail container -->
+  <div class="cursor-trail" id="cursorTrail" aria-hidden="true"></div>
+
+  <!-- Ambient sparkle particles -->
+  <div class="sparkle-dust" id="sparkleDust" aria-hidden="true"></div>
+
   <!-- Floating Hearts Background -->
   <div class="hearts-bg" id="heartsBg"></div>
 
@@ -194,7 +224,7 @@
           <span class="mood-label">If you're happy</span>
         </button>
         <button class="mood-btn" data-mood="missme">
-          <span class="mood-emoji">🤗</span>
+          <span class="mood-emoji">🫂</span>
           <span class="mood-label">If you miss me</span>
         </button>
         <button class="mood-btn" data-mood="angry">
@@ -213,6 +243,13 @@
       <div class="mood-message-box" id="moodMessageBox">
         <div class="mood-message-close" id="moodClose">✕</div>
         <p class="mood-message-text" id="moodMessageText"></p>
+      </div>
+      <div class="hug-section">
+        <p class="hug-prompt">Or… <span>press &amp; hold the heart</span> for a tight hug 🫂</p>
+        <button class="hug-btn" id="hugBtn" aria-label="Long press for a hug">
+          <span class="hug-fill"></span>
+          <span class="hug-emoji">🤍</span>
+        </button>
       </div>
       <button class="next-btn" data-next="page-openwhen">Next 📦</button>
     </div>
@@ -354,6 +391,17 @@
           <p class="shayari-line line-4">Kaise kahu ki sirf pyaar nahi, meri jaan ho tum.</p>
           <p class="shayari-attribution">— Sirf tumhare liye, Rashi 💕</p>
         </div>
+        <div class="shayari-paper" data-shayari="3">
+          <div class="shayari-corner shayari-corner-tl">❀</div>
+          <div class="shayari-corner shayari-corner-tr">❀</div>
+          <div class="shayari-corner shayari-corner-bl">❀</div>
+          <div class="shayari-corner shayari-corner-br">❀</div>
+          <p class="shayari-line line-1">Main tod leta agar tu gulab hoti...</p>
+          <p class="shayari-line line-2">Main jawab banta agar tu sawal hoti !!</p>
+          <p class="shayari-line line-3">Sab jante hain main nasha nahi karta...</p>
+          <p class="shayari-line line-4">Magar main pee bhi leta agar tu sharab hoti !!</p>
+          <p class="shayari-attribution">— Bas tere liye, Rashi 🌹</p>
+        </div>
       </div>
       <div class="shayari-controls">
         <button class="shayari-arrow" id="shayariPrev" aria-label="Previous shayari">‹</button>
@@ -418,10 +466,67 @@
           <div class="polaroid-img"><img src="photos/rashi8.jpg" alt="Rashi" loading="lazy"></div>
           <p class="polaroid-caption">My love 💖</p>
         </div>
+        <div class="polaroid" style="--rot: -5deg;">
+          <div class="polaroid-tape"></div>
+          <div class="polaroid-img"><img src="photos/rashi9.jpg" alt="Rashi" loading="lazy"></div>
+          <p class="polaroid-caption">My happiness 🌟</p>
+        </div>
+        <div class="polaroid" style="--rot: 4deg;">
+          <div class="polaroid-tape"></div>
+          <div class="polaroid-img"><img src="photos/rashi10.jpg" alt="Rashi" loading="lazy"></div>
+          <p class="polaroid-caption">Forever yours 💞</p>
+        </div>
+      </div>
+      <button class="next-btn" data-next="page-compliment">Next 💖</button>
+    </div>
+  </section>
+
+  <!-- ====== PAGE 9.8: COMPLIMENT GENERATOR ====== -->
+  <section class="page" id="page-compliment" data-bg="compliment">
+    <div class="page-inner">
+      <h2 class="section-title">Need a Compliment? 💕</h2>
+      <p class="section-subtitle">Tap the heart whenever you need a little reminder</p>
+      <div class="compliment-stage">
+        <div class="compliment-card" id="complimentCard">
+          <div class="compliment-default">
+            <span class="compliment-emoji">💖</span>
+            <p class="compliment-text">Tap the heart to receive one</p>
+          </div>
+          <div class="compliment-result">
+            <span class="compliment-quote-mark">❝</span>
+            <p class="compliment-result-text" id="complimentText"></p>
+            <span class="compliment-quote-mark close-mark">❞</span>
+          </div>
+        </div>
+        <button class="compliment-btn" id="complimentBtn">
+          <span class="compliment-btn-heart">💗</span>
+          <span class="compliment-btn-text">Get a compliment</span>
+        </button>
+        <p class="compliment-counter" id="complimentCounter"></p>
       </div>
       <button class="next-btn" data-next="page-wishes">Next 🌟</button>
     </div>
   </section>
+
+  <!-- Random Love Notes Toast -->
+  <div class="love-toast" id="loveToast" aria-hidden="true">
+    <span class="love-toast-icon">💌</span>
+    <p class="love-toast-text" id="loveToastText"></p>
+  </div>
+
+  <!-- Background Music -->
+  <audio id="bgMusic" loop preload="auto">
+    <source src="music/birthday.mp3" type="audio/mpeg">
+    <source src="music/birthday.m4a" type="audio/mp4">
+    <source src="music/birthday.ogg" type="audio/ogg">
+  </audio>
+
+  <button class="music-toggle" id="musicToggle" aria-label="Toggle background music">
+    <span class="music-disc">
+      <span class="music-icon">♪</span>
+    </span>
+    <span class="music-tooltip" id="musicTooltip">Tap for music</span>
+  </button>
 
   <!-- Lightbox for polaroid photos -->
   <div class="lightbox" id="lightbox">
